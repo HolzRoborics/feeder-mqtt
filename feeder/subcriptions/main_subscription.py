@@ -10,6 +10,9 @@ from settings import mqtt_settings
 from subcriptions.threaded.watchdog import WatchdogSubscription
 
 
+TOPICS = set()
+
+
 class MainTopicSubscription:
     def __init__(self, topic_name: str):
         self.topic_name = topic_name
@@ -29,8 +32,10 @@ class MainTopicSubscription:
         if data.WatchDog == SubscriptionStatus.REQUESTED:
             watchdog_name = f'{data.Name}/WatchDog'
 
-            watchdog = WatchdogSubscription(watchdog_name)
-            watchdog.start()
+            if watchdog_name not in TOPICS:
+                watchdog = WatchdogSubscription(watchdog_name)
+                watchdog.start()
+                TOPICS.add(watchdog)
 
             logger.debug(f'{self.topic_name} | started {watchdog_name}')
 
