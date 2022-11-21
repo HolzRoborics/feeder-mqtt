@@ -11,6 +11,7 @@ class MQTTSettings(BaseSettings):
     USERNAME: str = ''
     PASSWORD: str = ''
     CLIENT_NAME: str = 'Feeder'
+    USER_DATA: str = 'Feeder'
     MAIN_TOPIC_NAME: str = 'ConnectionCreator'
 
     class Config(ToolConfig):
