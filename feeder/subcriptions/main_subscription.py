@@ -2,7 +2,7 @@ from paho.mqtt import subscribe
 from paho.mqtt.client import MQTTMessage, Client
 
 from connections.mqtt import mqtt_client
-from schemas.error import ErrorMsg
+from schemas.subscription_status import SubscriptionStatus
 from schemas.topic_init import TopicInit
 from logs import logger
 from schemas.watchdog import WatchdogInitResponse
@@ -26,7 +26,7 @@ class MainTopicSubscription:
 
         logger.debug(f'{self.topic_name} | received {data}')
 
-        if data.WatchDog == 1:
+        if data.WatchDog == SubscriptionStatus.REQUESTED:
             watchdog_name = f'{data.Name}/WatchDog'
 
             watchdog = WatchdogSubscription(watchdog_name)
@@ -38,10 +38,10 @@ class MainTopicSubscription:
             mqtt_client.publish(self.topic_name, payload=response.json())
             logger.debug(f'{self.topic_name} | sent {response}')
 
-        else:
-            error_msg = ErrorMsg(error='incorrect_data')
-            mqtt_client.publish(self.topic_name, payload=error_msg.json())
-            logger.debug(f'{self.topic_name} | incorrent_data {data}')
+        elif data.WatchDog not in {_ for _ in SubscriptionStatus}:
+            response = WatchdogInitResponse(Name=data.Name, WatchDog=SubscriptionStatus.ERROR)
+            mqtt_client.publish(self.topic_name, payload=response.json())
+            logger.debug(f'{self.topic_name} | sent {response}')
 
     def run(self):
         subscribe.callback(

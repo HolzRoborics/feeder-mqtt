@@ -7,4 +7,4 @@ class WatchdogData(BaseModel):
 
 class WatchdogInitResponse(BaseModel):
     Name: str
-    WatchDog: str = 'OK'
+    WatchDog: int = 2
