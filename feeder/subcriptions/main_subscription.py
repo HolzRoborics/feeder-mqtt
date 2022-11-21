@@ -14,7 +14,14 @@ class MainTopicSubscription:
         self.topic_name = topic_name
 
     def callback(self, client, userdata, message: MQTTMessage):
-        data = TopicInit.parse_raw(message.payload)
+        try:
+            data = TopicInit.parse_raw(message.payload)
+            logger.debug(f'{self.topic_name} | received {data}')
+
+        except Exception as error:
+            logger.exception(error)
+            return
+
         logger.debug(f'{self.topic_name} | received {data}')
 
         if data.WatchDog is not None:
