@@ -1,4 +1,5 @@
 from time import sleep
+from typing import Optional
 
 from paho.mqtt.client import MQTTMessage
 
@@ -11,7 +12,7 @@ from .topic_subscription import TopicSubscription
 class WatchdogSubscription(TopicSubscription):
     def __init__(self, topic_name: str):
         super().__init__(topic_name)
-        self.counter = None
+        self.counter: Optional[int] = None
 
     def callback(self, client, userdata, message: MQTTMessage):
         try:
