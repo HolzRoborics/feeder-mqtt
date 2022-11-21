@@ -34,6 +34,6 @@ class WatchdogSubscription(TopicSubscription):
             data.Counter += 1
         self.counter = data.Counter
 
-        mqtt_client.publish(self.topic_name, payload=data.json())
+        mqtt_client.publish(self.topic_name, payload=data.json(), retain=True)
         logger.debug(f'{self.topic_name} | sent {data}')
 

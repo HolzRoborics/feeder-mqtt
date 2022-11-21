@@ -35,12 +35,12 @@ class MainTopicSubscription:
             logger.debug(f'{self.topic_name} | started {watchdog_name}')
 
             response = WatchdogInitResponse(Name=data.Name)
-            mqtt_client.publish(self.topic_name, payload=response.json())
+            mqtt_client.publish(self.topic_name, payload=response.json(), retain=True)
             logger.debug(f'{self.topic_name} | sent {response}')
 
         elif data.WatchDog not in {_ for _ in SubscriptionStatus}:
             response = WatchdogInitResponse(Name=data.Name, WatchDog=SubscriptionStatus.ERROR)
-            mqtt_client.publish(self.topic_name, payload=response.json())
+            mqtt_client.publish(self.topic_name, payload=response.json(), retain=True)
             logger.debug(f'{self.topic_name} | sent {response}')
 
     def run(self):
