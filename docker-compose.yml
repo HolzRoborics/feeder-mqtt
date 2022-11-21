@@ -1,13 +1,33 @@
+version: '3.4'
+
 services:
   mosquitto:
     image: eclipse-mosquitto:2
     volumes:
-      - ./config/:/mosquitto/config/:ro
+      - ./config/:/mosquitto/config/:rw
       - ./log/:/mosquitto/log/
       - data:/mosquitto/data/
+    restart: always
     ports:
-      - 1883:1883
-      - 9001:9001
+      - "1883:1883"
+      - "9001:9001"
+
+  feeder:
+    container_name:  feeder
+    build:
+      dockerfile: deployment/Dockerfile
+      context: .
+      args:
+        USER_ID: ${UID:-1000}
+        GROUP_ID: ${GID:-1000}
+        RUN_LEVEL: ${RUN_LEVEL}
+        PYTHON_VERSION: "3.10"
+      target: ${RUN_LEVEL}
+    env_file:
+      - .env
+    restart: always
+    depends_on:
+      - mosquitto
 
 volumes:
   data: ~

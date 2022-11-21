@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "feeder-mqtt"
+version = "0.1.0"
+description = ""
+authors = ["CherryNick <17rolex@gmail.com>"]
+readme = "README.md"
+packages = [{include = "feeder_mqtt"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+paho-mqtt = "^1.6.1"
+pydantic = "^1.10.2"
+loguru = "^0.6.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
