@@ -8,6 +8,8 @@ class ToolConfig:
 
 class MQTTSettings(BaseSettings):
     HOSTNAME: str = 'mosquitto'
+    USERNAME: str = ''
+    PASSWORD: str = ''
     MAIN_TOPIC_NAME: str = 'ConnectionCreator'
 
     class Config(ToolConfig):

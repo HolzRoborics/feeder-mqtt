@@ -29,7 +29,7 @@ class WatchdogSubscription(TopicSubscription):
             return
 
         if data.Counter >= 10000:
-            data.Counter = 0
+            data.Counter = 1
         else:
             data.Counter += 1
         self.counter = data.Counter

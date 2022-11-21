@@ -33,5 +33,6 @@ class MainTopicSubscription:
         subscribe.callback(
             callback=self.callback,
             topics=self.topic_name,
-            hostname=mqtt_settings.HOSTNAME
+            hostname=mqtt_settings.HOSTNAME,
+            auth={'username': mqtt_settings.USERNAME, 'password': mqtt_settings.PASSWORD}
         )
