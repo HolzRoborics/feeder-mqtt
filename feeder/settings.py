@@ -10,6 +10,7 @@ class MQTTSettings(BaseSettings):
     HOSTNAME: str = 'mosquitto'
     USERNAME: str = ''
     PASSWORD: str = ''
+    CLIENT_NAME: str = 'Feeder'
     MAIN_TOPIC_NAME: str = 'ConnectionCreator'
 
     class Config(ToolConfig):

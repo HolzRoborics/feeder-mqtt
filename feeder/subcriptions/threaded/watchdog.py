@@ -1,7 +1,7 @@
 from time import sleep
 from typing import Optional
 
-from paho.mqtt.client import MQTTMessage
+from paho.mqtt.client import MQTTMessage, Client
 
 from connections.mqtt import mqtt_client
 from logs import logger
@@ -14,7 +14,7 @@ class WatchdogSubscription(TopicSubscription):
         super().__init__(topic_name)
         self.counter: Optional[int] = None
 
-    def callback(self, client, userdata, message: MQTTMessage):
+    def callback(self, client: Client, userdata, message: MQTTMessage):
         try:
             data = WatchdogData.parse_raw(message.payload)
             logger.debug(f'{self.topic_name} | received {data}')
