@@ -5,4 +5,4 @@ from pydantic import BaseModel
 
 class TopicInit(BaseModel):
     Name: str
-    WatchDog: Optional[bool] = False
+    WatchDog: Optional[int] = 0
