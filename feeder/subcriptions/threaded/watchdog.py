@@ -6,6 +6,7 @@ from paho.mqtt.client import MQTTMessage, Client
 from connections.mqtt import mqtt_client
 from logs import logger
 from schemas.watchdog import WatchdogData
+from settings import mqtt_settings
 from .topic_subscription import TopicSubscription
 
 
@@ -27,11 +28,16 @@ class WatchdogSubscription(TopicSubscription):
             logger.info(f'{self.topic_name} | received same value')
             sleep(1)
             return
+        elif data.Sender == mqtt_settings.CLIENT_NAME:
+            sleep(1)
+            return
 
         if data.Counter >= 10000:
             data.Counter = 1
         else:
             data.Counter += 1
+
+        data.Sender = mqtt_settings.CLIENT_NAME
         self.counter = data.Counter
 
         mqtt_client.publish(self.topic_name, payload=data.json(), retain=True)

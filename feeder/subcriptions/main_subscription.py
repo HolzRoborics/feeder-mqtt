@@ -1,3 +1,5 @@
+from time import sleep
+
 from paho.mqtt import subscribe
 from paho.mqtt.client import MQTTMessage, Client
 
@@ -18,7 +20,6 @@ class MainTopicSubscription:
         self.topic_name = topic_name
 
     def callback(self, client: Client, userdata, message: MQTTMessage):
-        logger.info(userdata)
         try:
             data = TopicInit.parse_raw(message.payload)
             logger.debug(f'{self.topic_name} | received {data}')
@@ -27,7 +28,9 @@ class MainTopicSubscription:
             logger.exception(error)
             return
 
-        logger.debug(f'{self.topic_name} | received {data}')
+        if data.Sender == mqtt_settings.CLIENT_NAME:
+            sleep(1)
+            return
 
         if data.WatchDog == SubscriptionStatus.REQUESTED:
             watchdog_name = f'{data.Name}/WatchDog'
@@ -35,17 +38,24 @@ class MainTopicSubscription:
             if watchdog_name not in TOPICS:
                 watchdog = WatchdogSubscription(watchdog_name)
                 watchdog.start()
-                TOPICS.add(watchdog)
 
-            logger.debug(f'{self.topic_name} | started {watchdog_name}')
+                logger.debug(f'{self.topic_name} | started {watchdog_name}')
 
-            response = WatchdogInitResponse(Name=data.Name)
-            mqtt_client.publish(self.topic_name, payload=response.json(), retain=True)
-            logger.debug(f'{self.topic_name} | sent {response}')
+                TOPICS.add(watchdog_name)
+            else:
+                response = WatchdogInitResponse(Name=data.Name, Sender=mqtt_settings.CLIENT_NAME)
+                mqtt_client.publish(self.topic_name, payload=response.json(), retain=True)
+
+                logger.debug(f'{self.topic_name} | sent {response}')
 
         elif data.WatchDog not in {_ for _ in SubscriptionStatus}:
-            response = WatchdogInitResponse(Name=data.Name, WatchDog=SubscriptionStatus.ERROR)
+            response = WatchdogInitResponse(
+                Name=data.Name,
+                WatchDog=SubscriptionStatus.ERROR,
+                Sender=mqtt_settings.CLIENT_NAME,
+            )
             mqtt_client.publish(self.topic_name, payload=response.json(), retain=True)
+
             logger.debug(f'{self.topic_name} | sent {response}')
 
     def run(self):
