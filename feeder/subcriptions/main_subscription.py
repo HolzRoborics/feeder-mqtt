@@ -3,7 +3,7 @@ from time import sleep
 from paho.mqtt import subscribe
 from paho.mqtt.client import MQTTMessage, Client
 
-from connections.mqtt import mqtt_client
+from connections.mqtt import get_client
 from schemas.subscription_status import SubscriptionStatus
 from schemas.topic_init import TopicInit
 from logs import logger
@@ -42,11 +42,12 @@ class MainTopicSubscription:
                 logger.debug(f'{self.topic_name} | started {watchdog_name}')
 
                 TOPICS.add(watchdog_name)
-            else:
-                response = WatchdogInitResponse(Name=data.Name, Sender=mqtt_settings.CLIENT_NAME)
-                mqtt_client.publish(self.topic_name, payload=response.json(), retain=True)
 
-                logger.debug(f'{self.topic_name} | sent {response}')
+                response = WatchdogInitResponse(Name=data.Name, Sender=mqtt_settings.CLIENT_NAME)
+                with get_client() as mqtt_client:
+                    mqtt_client.publish(self.topic_name, payload=response.json(), retain=True)
+
+                    logger.debug(f'{self.topic_name} | sent {response}')
 
         elif data.WatchDog not in {_ for _ in SubscriptionStatus}:
             response = WatchdogInitResponse(
@@ -54,9 +55,10 @@ class MainTopicSubscription:
                 WatchDog=SubscriptionStatus.ERROR,
                 Sender=mqtt_settings.CLIENT_NAME,
             )
-            mqtt_client.publish(self.topic_name, payload=response.json(), retain=True)
+            with get_client() as mqtt_client:
+                mqtt_client.publish(self.topic_name, payload=response.json(), retain=True)
 
-            logger.debug(f'{self.topic_name} | sent {response}')
+                logger.debug(f'{self.topic_name} | sent {response}')
 
     def run(self):
         subscribe.callback(

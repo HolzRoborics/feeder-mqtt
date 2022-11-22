@@ -3,7 +3,7 @@ from typing import Optional
 
 from paho.mqtt.client import MQTTMessage, Client
 
-from connections.mqtt import mqtt_client
+from connections.mqtt import get_client
 from logs import logger
 from schemas.watchdog import WatchdogData
 from settings import mqtt_settings
@@ -40,6 +40,8 @@ class WatchdogSubscription(TopicSubscription):
         data.Sender = mqtt_settings.CLIENT_NAME
         self.counter = data.Counter
 
-        mqtt_client.publish(self.topic_name, payload=data.json(), retain=True)
-        logger.debug(f'{self.topic_name} | sent {data}')
+        with get_client() as mqtt_client:
+            mqtt_client.publish(self.topic_name, payload=data.json(), retain=True)
+
+            logger.debug(f'{self.topic_name} | sent {data}')
 
